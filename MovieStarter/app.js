@@ -10,7 +10,7 @@ let movieHistory = {};
 function createMovieHistoryTable() {
     var table = document.createElement("table");
     table.id = "movieHistoryTable";
-    table.innerHTML = "<tr><th>Movie Name</th><th>Times Watched</th></tr>";
+    table.innerHTML = "<tr><th>Title</th><th>Watched</th></tr>";
     document.getElementById("movieHistoryCard").appendChild(table);
     return table;
 }
@@ -33,6 +33,7 @@ function addMovie() {
         alert("Enter a Movie!");
         return;
     }
+    updateMovieHistory(userTypedText); // Increment times watched
 
     // Check if the movie already exists in the movie list
     const movieItems = myMovieList.getElementsByTagName("li");
@@ -40,13 +41,13 @@ function addMovie() {
     for (const item of movieItems) {
         if (item.innerText.toLowerCase() === userTypedText) {
             clearInput();
-            updateMovieHistory(userTypedText); // Increment times watched
             return;
         }
     }
     
     // Step 2: Create an empty <li></li>
     var li = document.createElement("li"); // <li></li>
+    li.style.listStyle = "none";
 
     // Step 3: Prepare the text we will insert INTO that li ^...example: Harry Potter
     var textToInsert = document.createTextNode(userTypedText);
@@ -70,7 +71,6 @@ function addMovie() {
     localStorage.setItem("movieHistory", JSON.stringify(movieHistory));
 }
 
-// Function to add a movie to the movie history table
 function addMovieToHistoryTable(movie, timesWatched) {
     var table = movieHistoryTable;
 
@@ -82,7 +82,6 @@ function addMovieToHistoryTable(movie, timesWatched) {
     cell2.innerHTML = timesWatched;
 }
 
-// Function to update the movie history
 function updateMovieHistory(movie) {
     movieHistory[movie]++;
     var table = movieHistoryTable;
@@ -94,6 +93,18 @@ function updateMovieHistory(movie) {
         }
     }
 }
+
+function loadMovieHistoryFromLocalStorage() {
+    if (localStorage.getItem("movieHistory")) {
+        movieHistory = JSON.parse(localStorage.getItem("movieHistory"));
+
+        for (const movie in movieHistory) {
+            addMovieToHistoryTable(movie, movieHistory[movie]);
+        }
+    }
+}
+
+loadMovieHistoryFromLocalStorage();
 
 searchInput.addEventListener("input", () => {
     const searchKeyword = searchInput.value.trim().toLowerCase();
