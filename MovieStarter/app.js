@@ -14,6 +14,28 @@ function clearMovies() {
     // To delete all children of the <ul></ul> (meaning all <li>'s)..we can wipe out the <ul>'s innerHTML
     myMovieList.innerHTML = '';
 }
+function updateMovieHistoryTable() {
+    const movieHistoryTable = document.querySelector("#movieHistoryTable");
+    movieHistoryTable.innerHTML = ""; // Clear the table
+  
+    for (const movie in movieHistory) {
+      const row = movieHistoryTable.insertRow();
+      const cell1 = row.insertCell(0);
+      const cell2 = row.insertCell(1);
+  
+      cell1.innerHTML = movie;
+      cell2.innerHTML = movieHistory[movie];
+    }
+}
+  
+// Load movie history from local storage when the page loads
+window.addEventListener("load", () => {
+    const storedMovieHistory = localStorage.getItem("movieHistory");
+    if (storedMovieHistory) {
+    movieHistory = JSON.parse(storedMovieHistory);
+    updateMovieHistoryTable();
+    }
+});
 
 // This function is executed when the user clicks [ADD MOVIE] button.
 function addMovie() {
@@ -75,26 +97,3 @@ searchInput.addEventListener("input", () => {
 });
 
 
-
-function updateMovieHistoryTable() {
-    const movieHistoryTable = document.querySelector("#movieHistoryTable");
-    movieHistoryTable.innerHTML = ""; // Clear the table
-  
-    for (const movie in movieHistory) {
-      const row = movieHistoryTable.insertRow();
-      const cell1 = row.insertCell(0);
-      const cell2 = row.insertCell(1);
-  
-      cell1.innerHTML = movie;
-      cell2.innerHTML = movieHistory[movie];
-    }
-}
-  
-// Load movie history from local storage when the page loads
-window.addEventListener("load", () => {
-    const storedMovieHistory = localStorage.getItem("movieHistory");
-    if (storedMovieHistory) {
-    movieHistory = JSON.parse(storedMovieHistory);
-    updateMovieHistoryTable();
-    }
-});
