@@ -10,6 +10,7 @@ let movieHistory = {};
 function createMovieHistoryTable() {
     var table = document.createElement("table");
     table.id = "movieHistoryTable";
+    table.style.width = "100%";
     table.innerHTML = "<tr><th>Title</th><th>Watched</th></tr>";
     document.getElementById("movieHistoryCard").appendChild(table);
     return table;
