@@ -2,8 +2,18 @@
 var inp = document.querySelector("input");
 var myMovieList = document.querySelector("ul");
 const searchInput = document.querySelector("#filter");
+const movieHistoryTable = createMovieHistoryTable(); // Create the movie history table
+
 
 let movieHistory = {};
+// Function to create a movie history table
+function createMovieHistoryTable() {
+    var table = document.createElement("table");
+    table.id = "movieHistoryTable";
+    table.innerHTML = "<tr><th>Movie Name</th><th>Times Watched</th></tr>";
+    document.getElementById("movieHistoryCard").appendChild(table);
+    return table;
+}
 
 // Example of a simple function that clears the input after a user types something in
 function clearInput() {
@@ -14,28 +24,6 @@ function clearMovies() {
     // To delete all children of the <ul></ul> (meaning all <li>'s)..we can wipe out the <ul>'s innerHTML
     myMovieList.innerHTML = '';
 }
-function updateMovieHistoryTable() {
-    const movieHistoryTable = document.querySelector("#movieHistoryTable");
-    movieHistoryTable.innerHTML = ""; // Clear the table
-  
-    for (const movie in movieHistory) {
-      const row = movieHistoryTable.insertRow();
-      const cell1 = row.insertCell(0);
-      const cell2 = row.insertCell(1);
-  
-      cell1.innerHTML = movie;
-      cell2.innerHTML = movieHistory[movie];
-    }
-}
-  
-// Load movie history from local storage when the page loads
-window.addEventListener("load", () => {
-    const storedMovieHistory = localStorage.getItem("movieHistory");
-    if (storedMovieHistory) {
-    movieHistory = JSON.parse(storedMovieHistory);
-    updateMovieHistoryTable();
-    }
-});
 
 // This function is executed when the user clicks [ADD MOVIE] button.
 function addMovie() {
@@ -45,17 +33,15 @@ function addMovie() {
         alert("Enter a Movie!");
         return;
     }
+
     // Check if the movie already exists in the movie list
     const movieItems = myMovieList.getElementsByTagName("li");
 
     for (const item of movieItems) {
         if (item.innerText.toLowerCase() === userTypedText) {
-        // Increment the watch count in the movie history
-        movieHistory[userTypedText] = (movieHistory[userTypedText] || 1) + 1;
-        // Update the movie history table
-        updateMovieHistoryTable();
-        clearInput();
-        return;
+            clearInput();
+            updateMovieHistory(userTypedText); // Increment times watched
+            return;
         }
     }
     
@@ -72,14 +58,41 @@ function addMovie() {
     // Step 5: Insert the <li>Harry Potter</li> INTO the <ul>
     myMovieList.appendChild(li);
 
-    // Add the movie to the movie history
-    movieHistory[userTypedText] = 1;
-
-    // Update the movie history table
-    updateMovieHistoryTable();
+    // Initialize movie history if not present
+    if (!movieHistory[userTypedText]) {
+        movieHistory[userTypedText] = 1;
+        addMovieToHistoryTable(userTypedText, 1); // Add a new entry to the table
+    }
 
     // Step 6: Call the clearInput function to clear the input field
     clearInput();
+
+    localStorage.setItem("movieHistory", JSON.stringify(movieHistory));
+}
+
+// Function to add a movie to the movie history table
+function addMovieToHistoryTable(movie, timesWatched) {
+    var table = movieHistoryTable;
+
+    var newRow = table.insertRow(table.rows.length);
+    var cell1 = newRow.insertCell(0);
+    var cell2 = newRow.insertCell(1);
+
+    cell1.innerHTML = movie;
+    cell2.innerHTML = timesWatched;
+}
+
+// Function to update the movie history
+function updateMovieHistory(movie) {
+    movieHistory[movie]++;
+    var table = movieHistoryTable;
+    for (var i = 1; i < table.rows.length; i++) {
+        var row = table.rows[i];
+        if (row.cells[0].innerHTML.trim().toLowerCase() === movie) {
+            row.cells[1].innerHTML = movieHistory[movie];
+            return;
+        }
+    }
 }
 
 searchInput.addEventListener("input", () => {
@@ -95,5 +108,3 @@ searchInput.addEventListener("input", () => {
         }
     }
 });
-
-
